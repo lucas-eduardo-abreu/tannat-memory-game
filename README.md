@@ -45,18 +45,22 @@ tannat-memory-game/
 ├── game.js
 └── assets/
     ├── bg/            fundos otimizados (fotos reais do evento no TANNAT)
+    ├── cards/         16 fotos usadas nas cartas (1.png … 16.png)
     └── logo/          goblet TANNAT (SVG) + M2 Entretenimentos (PNG)
 ```
 
-Os ícones das cartas e o goblet são **SVG inline** (dentro do `game.js`/`index.html`):
-nítidos em qualquer resolução, carregam na hora e não dependem de arquivos externos.
+O goblet (marca/verso da carta) é **SVG inline** (dentro do `game.js`). A frente das
+cartas usa as **fotos** de `assets/cards/`: a cada partida, `CARD_IMAGES` é embaralhado
+e cada dificuldade sorteia quantas fotos precisar (6/8/12 pares), então o conjunto e a
+posição das cartas mudam a cada rodada.
 
 ## Personalizações rápidas
 
 - **Cores / tipografia:** variáveis no topo do `style.css` (`:root`).
 - **Tempo / nº de pares:** objeto `DIFFS` no `game.js`.
-- **Baralho de ícones:** objeto `ICONS` + `ICON_ORDER` no `game.js`. É simples trocar
-  por fotos: cada carta usa `iconSVG(k)` — dá pra apontar para `<img src=...>`.
+- **Fotos das cartas:** troque os arquivos em `assets/cards/` (mantenha 16 imagens
+  nomeadas `1`…`16`, mesma extensão por arquivo) — o array `CARD_IMAGES` no `game.js`
+  monta a lista automaticamente a partir desses nomes.
 - **Fundos:** substitua os arquivos em `assets/bg/`.
 
 ## Nota para totem offline

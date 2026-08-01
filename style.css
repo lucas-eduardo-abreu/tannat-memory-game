@@ -256,19 +256,18 @@ body {
 .card-goblet { width: 52%; color: var(--gold-300); filter: drop-shadow(0 2px 6px rgba(0,0,0,.5)); }
 .card-goblet svg { width: 100%; height: auto; }
 
-/* frente: ícone dourado sobre pergaminho */
+/* frente: foto ocupando a carta inteira, sem moldura */
 .card__face--front {
   transform: rotateY(180deg);
-  background: linear-gradient(160deg, var(--parch), #e2d2b0);
-  border: 1px solid rgba(201,154,63,.6);
-  box-shadow: inset 0 0 0 4px rgba(255,255,255,.35), 0 8px 20px -10px rgba(0,0,0,.6);
-  padding: 14%;
+  background: var(--wine-900);
+  border: 1px solid transparent;
+  box-shadow: 0 8px 20px -10px rgba(0,0,0,.6);
 }
-.card__face--front .icon { width: 100%; height: 100%; color: var(--wine-700); }
-.card__face--front .icon svg { width: 100%; height: 100%; }
+.card__face--front .card-img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
 .card.matched .card__face--front { border-color: var(--gold-400);
-  box-shadow: inset 0 0 0 4px rgba(240,210,127,.6), 0 0 26px rgba(240,210,127,.5); }
-.card.matched .card__face--front .icon { color: var(--wine-600); }
+  box-shadow: 0 0 0 3px rgba(240,210,127,.5) inset, 0 0 26px rgba(240,210,127,.5); }
 .card.matched { animation: matched-pop .5s ease; }
 @keyframes matched-pop { 0%{transform:scale(1)} 45%{transform:scale(1.07)} 100%{transform:scale(1)} }
 .card.wrong .card__inner { animation: shake .4s ease; }

@@ -14,34 +14,15 @@ const GOBLET = `<svg viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/
   <path d="M30 98h40" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/>
 </svg>`;
 
-/* ---------- baralho de ícones (line-art dourado) ----------
-   Ordenados por "peso visual" — os mais icônicos primeiro,
-   para que o Fácil use os mais reconhecíveis.                */
+/* ---------- goblet usado na marca / dificuldade ---------- */
 const ICONS = {
-  goblet:  `<path d="M7 3h10v3a5 5 0 0 1-10 0z"/><path d="M12 14v6"/><path d="M8 21h8"/>`,
-  cheers:  `<path d="M8 3l-2 8a2.6 2.6 0 0 0 5 1"/><path d="M16 3l2 8a2.6 2.6 0 0 1-5 1"/><path d="M9.6 13l.9 7"/><path d="M14.4 13l-.9 7"/><path d="M8.5 20h3"/><path d="M12.5 20h3"/>`,
-  bottle:  `<path d="M10 2h4v4l1.2 3v10a1 1 0 0 1-1 1H9.8a1 1 0 0 1-1-1V9L10 6z"/><path d="M8.8 13h6.4"/>`,
-  grapes:  `<circle cx="9" cy="12" r="2.1"/><circle cx="13" cy="12" r="2.1"/><circle cx="11" cy="15.4" r="2.1"/><circle cx="15" cy="15.4" r="2.1"/><path d="M13 5.5v3"/><path d="M13 5.5c1.8-.8 3-1.7 3.8-2.5"/>`,
-  cocktail:`<path d="M4 5h16l-8 8z"/><path d="M12 13v7"/><path d="M8.5 20h7"/><path d="M12 9l4.2-4.2"/><circle cx="16.6" cy="4.4" r="1"/>`,
-  disco:   `<circle cx="12" cy="13.5" r="6"/><path d="M12 7.5v12M6 13.5h12M7.8 9.7l8.4 7.6M16.2 9.7l-8.4 7.6"/><path d="M12 7.5V4M9.2 4h5.6"/>`,
-  camera:  `<rect x="3" y="7.5" width="18" height="12.5" rx="2.4"/><circle cx="12" cy="13.6" r="3.4"/><path d="M8.2 7.5 9.6 4.6h4.8L15.8 7.5"/>`,
-  mirror:  `<rect x="6" y="2.5" width="12" height="19" rx="6"/><rect x="8.6" y="5.2" width="6.8" height="13.6" rx="3.4"/><path d="M10.2 8.4l1.2 1.2"/>`,
-  music:   `<path d="M9.5 18V6.2l8-1.8V15"/><circle cx="7.4" cy="18" r="2.1"/><circle cx="15.4" cy="15.4" r="2.1"/>`,
-  crown:   `<path d="M4 8.5l3.2 8h9.6l3.2-8-5 3.8L12 6l-3 6.3z"/><path d="M6.2 19.5h11.6"/>`,
-  star:    `<path d="M12 3l2.5 5.9 6.4.5-4.9 4.2 1.6 6.2L12 16.9 6.4 20l1.6-6.2L3.1 9.6l6.4-.5z"/>`,
-  heart:   `<path d="M12 20s-6.8-4.4-6.8-9.4A3.5 3.5 0 0 1 12 7a3.5 3.5 0 0 1 6.8 3.6C18.8 15.6 12 20 12 20z"/>`,
-  gift:    `<rect x="4" y="9" width="16" height="11" rx="1"/><path d="M4 13h16M12 9v11"/><path d="M12 9c-2 0-4-1-4-3a2 2 0 0 1 4 0M12 9c2 0 4-1 4-3a2 2 0 0 0-4 0"/>`,
-  coffee:  `<path d="M5 8h12v5.2a5 5 0 0 1-10 0z"/><path d="M17 9h1.8a2.1 2.1 0 0 1 0 4.2H17"/><path d="M6 21h11"/><path d="M9 3.2v2M12 3.2v2"/>`,
-  spark:   `<path d="M12 3v5.5M12 15.5V21M3.5 12H9M15 12h5.5"/><path d="M12 8.5l1.8 1.7L15.5 12l-1.7 1.8L12 15.5l-1.8-1.7L8.5 12l1.7-1.8z"/>`,
-  balloon: `<path d="M12 3.6c2.9 0 5 2.4 5 5.6 0 4.1-3.3 6.8-5 6.8s-5-2.7-5-6.8c0-3.2 2.1-5.6 5-5.6z"/><path d="M12 16v1.6"/><path d="M10.8 17.6h2.4l-1.2 2.8z"/>`,
-  slider:  `<path d="M5 10.5a7 3.5 0 0 1 14 0z"/><path d="M5 13.6h14"/><path d="M6 16.4a6 3 0 0 0 12 0z"/>`,
-  corksc:  `<path d="M9.5 3h5M12 3v3.4"/><path d="M12 6.4c1.7 0 1.7 1.5 0 1.5M12 7.9c-1.7 0-1.7 1.5 0 1.5M12 9.4c1.7 0 1.7 1.5 0 1.5M12 10.9c-1.7 0-1.7 1.5 0 1.5"/><path d="M12 12.4V21"/>`,
-  cheese:  `<path d="M3.5 14 18 8l3 4.2V16H3.5z"/><circle cx="9" cy="14.4" r="1"/><circle cx="14" cy="13.4" r="1"/>`,
-  spotl:   `<path d="M7.5 3.5h9v4h-9z"/><path d="M8.5 7.5 5.5 20.5M15.5 7.5l3 13"/><path d="M4.5 20.5h15"/>`,
+  goblet: `<path d="M7 3h10v3a5 5 0 0 1-10 0z"/><path d="M12 14v6"/><path d="M8 21h8"/>`,
 };
-const ICON_ORDER = ["goblet","cheers","bottle","grapes","cocktail","disco","camera","mirror","music","crown","star","heart","gift","coffee","spark","balloon","slider","corksc","cheese","spotl"];
 
-function iconSVG(name){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]}</svg>`; }
+/* ---------- baralho de cartas (fotos em assets/cards) ----------
+   16 imagens disponíveis; cada dificuldade sorteia aleatoriamente
+   quantos pares precisar (6/8/12) a cada partida.                */
+const CARD_IMAGES = Array.from({ length: 16 }, (_, i) => `assets/cards/${i + 1}.png`);
 
 /* ---------- config ---------- */
 const DIFFS = {
@@ -155,7 +136,7 @@ function startGame(diff){
   board.innerHTML="";
   board.style.pointerEvents="auto";
 
-  const picks=ICON_ORDER.slice(0,cfg.pairs);
+  const picks=shuffle([...CARD_IMAGES]).slice(0,cfg.pairs);
   const deck=shuffle(picks.flatMap(k=>[{k},{k}]));
 
   deck.forEach(({k})=>{
@@ -164,7 +145,7 @@ function startGame(diff){
     card.innerHTML=`
       <div class="card__inner">
         <div class="card__face card__face--back"><div class="card-goblet">${GOBLET}</div></div>
-        <div class="card__face card__face--front"><div class="icon">${iconSVG(k)}</div></div>
+        <div class="card__face card__face--front"><img class="card-img" src="${k}" alt="" draggable="false"></div>
       </div>`;
     const act=()=>flip(card);
     card.addEventListener("click",act);

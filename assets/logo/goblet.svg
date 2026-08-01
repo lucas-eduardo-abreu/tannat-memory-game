@@ -1,0 +1,11 @@
+<svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg" fill="none" role="img" aria-label="TANNAT">
+  <!-- goblet bowl -->
+  <path d="M24 14 h52 a4 4 0 0 1 4 4 v10 a30 30 0 0 1 -30 30 a30 30 0 0 1 -30 -30 v-10 a4 4 0 0 1 4 -4 Z"
+        stroke="currentColor" stroke-width="5.5" stroke-linejoin="round"/>
+  <!-- smile / wine surface inside the cup -->
+  <path d="M36 30 q14 16 28 0" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/>
+  <!-- stem -->
+  <path d="M50 58 v34" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/>
+  <!-- base -->
+  <path d="M30 98 h40" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/>
+</svg>
