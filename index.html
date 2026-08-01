@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>TANNAT · Jogo da Memória</title>
+  <meta name="theme-color" content="#120406">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..600&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="app" aria-live="polite">
+
+    <!-- ============ INÍCIO ============ -->
+    <section id="screen-start" class="screen screen--active" aria-label="Tela inicial">
+      <div class="ambient"></div>
+      <div class="corner-tools">
+        <button class="btn btn--icon" id="btn-sound" aria-label="Som" data-tip="Som"></button>
+        <button class="btn btn--icon" id="btn-fs" aria-label="Tela cheia" data-tip="Tela cheia"></button>
+      </div>
+
+      <div class="start__stack">
+        <div class="brand">
+          <div class="brand__goblet" id="brand-goblet" aria-hidden="true"></div>
+          <div class="wordmark">TANNAT</div>
+          <div class="tagline">wine&nbsp;bar</div>
+        </div>
+
+        <p class="start__lead">O vinho melhora com o tempo.<br>Sua memória, a gente testa agora.</p>
+
+        <div class="rule" aria-hidden="true"><span id="rule-goblet"></span></div>
+
+        <button class="btn btn--hero" id="btn-play">Jogar</button>
+        <span class="attract-hint">Toque para começar</span>
+      </div>
+
+      <div class="credit">
+        <span>Entretenimento por</span>
+        <img src="assets/logo/m2.png" alt="M2 Entretenimentos">
+      </div>
+    </section>
+
+    <!-- ============ SELEÇÃO ============ -->
+    <section id="screen-select" class="screen" aria-label="Escolha a dificuldade">
+      <div class="ambient"></div>
+      <div class="panel">
+        <div class="brand">
+          <div class="wordmark wordmark--sm">TANNAT</div>
+        </div>
+        <h2 class="panel__title">Escolha sua <em>rodada</em></h2>
+
+        <div class="diff-grid" id="diff-grid" role="group" aria-label="Níveis de dificuldade"></div>
+
+        <button class="btn btn--ghost" id="btn-back-start">Voltar</button>
+      </div>
+    </section>
+
+    <!-- ============ JOGO ============ -->
+    <section id="screen-game" class="screen" aria-label="Tabuleiro">
+      <header class="topbar" role="toolbar" aria-label="Painel do jogo">
+        <div class="topbar__left">
+          <button class="btn btn--icon" id="btn-exit" aria-label="Voltar ao menu"></button>
+        </div>
+        <div class="topbar__center">
+          <span class="badge" id="hud-diff">—</span>
+          <div class="stat"><span class="stat__num" id="hud-pairs">0/0</span><span class="stat__lbl">Pares</span></div>
+          <div class="timer" id="timer">
+            <span class="timer__digits" id="hud-time">00:00</span>
+            <div class="timer__track"><div class="timer__fill" id="timer-fill" style="width:100%"></div></div>
+          </div>
+          <div class="stat"><span class="stat__num" id="hud-moves">0</span><span class="stat__lbl">Jogadas</span></div>
+        </div>
+        <div class="topbar__right">
+          <button class="btn btn--icon" id="btn-sound-2" aria-label="Som"></button>
+        </div>
+      </header>
+      <div id="board" class="board" role="grid" aria-label="Cartas"></div>
+    </section>
+
+    <!-- ============ VITÓRIA ============ -->
+    <section id="screen-win" class="screen" aria-label="Vitória">
+      <canvas id="confetti" class="confetti" aria-hidden="true"></canvas>
+      <div class="ambient"></div>
+      <div class="result">
+        <span class="result__eyebrow">Saúde! 🥂</span>
+        <h2 class="result__title">Você <em>fechou a taça</em></h2>
+        <div class="result__record" id="win-record" hidden><span id="win-record-txt"></span></div>
+        <div class="result__stats">
+          <div class="result__stat"><span class="v" id="win-time">00:00</span><span class="k">Seu tempo</span></div>
+          <div class="result__stat"><span class="v" id="win-moves">0</span><span class="k">Jogadas</span></div>
+          <div class="result__stat"><span class="v" id="win-best">—</span><span class="k">Recorde</span></div>
+        </div>
+
+        <div class="name-row" id="name-row">
+          <input id="win-name" maxlength="14" placeholder="Seu nome para o ranking" autocomplete="off">
+          <button class="btn" id="btn-save-name">Salvar</button>
+        </div>
+
+        <div class="ranks" id="ranks" hidden>
+          <div class="ranks__h">Ranking da noite</div>
+          <ol id="ranks-list"></ol>
+        </div>
+
+        <div class="result__actions">
+          <button class="btn" id="btn-again">Jogar de novo</button>
+          <button class="btn btn--ghost" id="btn-menu">Menu</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ DERROTA ============ -->
+    <section id="screen-lose" class="screen" aria-label="Tempo esgotado">
+      <div class="ambient"></div>
+      <div class="result">
+        <span class="result__eyebrow">A taça secou ⏳</span>
+        <h2 class="result__title">O <em>tempo</em> venceu dessa vez</h2>
+        <div class="result__stats">
+          <div class="result__stat"><span class="v" id="lose-pairs">0/0</span><span class="k">Pares achados</span></div>
+          <div class="result__stat"><span class="v" id="lose-moves">0</span><span class="k">Jogadas</span></div>
+        </div>
+        <div class="result__actions">
+          <button class="btn" id="btn-retry">Tentar de novo</button>
+          <button class="btn btn--ghost" id="btn-lose-menu">Menu</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+  <script src="game.js" defer></script>
+</body>
+</html>
