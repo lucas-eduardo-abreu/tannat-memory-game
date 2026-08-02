@@ -29,7 +29,16 @@ qualquer tela — celular, notebook ou totem, em retrato ou paisagem.
   linguagem da marca (taça, brinde, garrafa, uvas, drink, globo, câmera, etc.).
 - Timer com barra, contador de **jogadas** e **pares**.
 - **Som** por WebAudio (sem arquivos) — botão liga/desliga, preferência salva.
-- **Recorde** por dificuldade + **ranking da noite** (top 8, com nome do convidado).
+- **Recorde** por dificuldade + **ranking da noite** (top 8). O nome usado no
+  ranking é o mesmo informado na captação de lead — não pede nome de novo na
+  tela de vitória.
+- **Captação de lead**: antes de cada partida, o jogador informa nome, idade e
+  telefone; os dados ficam salvos no `localStorage` (`tannat_leads`).
+- **Painel admin (tecla F9)**: mostra a lista de leads capturados neste
+  navegador/totem, permite **exportar em CSV** (abre direto no Excel, com
+  acentuação correta) e **limpar a lista** (botão "Limpar lista" pede uma
+  segunda confirmação em até 4s, para evitar apagar sem querer). Tecla
+  **Esc** ou botão "Fechar" para sair do painel.
 - **Confete** ouro + prata + vinho na vitória.
 - **Modo attract**: após 25 s ocioso na tela inicial, pulsa "Toque para começar".
 - Botão **tela cheia**, atalho **Esc** para sair da partida.
@@ -45,7 +54,7 @@ tannat-memory-game/
 ├── game.js
 └── assets/
     ├── bg/            fundos otimizados (fotos reais do evento no TANNAT)
-    ├── cards/         16 fotos usadas nas cartas (1.png … 16.png)
+    ├── cards/         29 fotos usadas nas cartas (1.png … 29.png)
     └── logo/          goblet TANNAT (SVG) + M2 Entretenimentos (PNG)
 ```
 
@@ -58,8 +67,8 @@ posição das cartas mudam a cada rodada.
 
 - **Cores / tipografia:** variáveis no topo do `style.css` (`:root`).
 - **Tempo / nº de pares:** objeto `DIFFS` no `game.js`.
-- **Fotos das cartas:** troque os arquivos em `assets/cards/` (mantenha 16 imagens
-  nomeadas `1`…`16`, mesma extensão por arquivo) — o array `CARD_IMAGES` no `game.js`
+- **Fotos das cartas:** troque os arquivos em `assets/cards/` (mantenha 29 imagens
+  nomeadas `1`…`29`, mesma extensão por arquivo) — o array `CARD_IMAGES` no `game.js`
   monta a lista automaticamente a partir desses nomes.
 - **Fundos:** substitua os arquivos em `assets/bg/`.
 

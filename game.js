@@ -20,9 +20,9 @@ const ICONS = {
 };
 
 /* ---------- baralho de cartas (fotos em assets/cards) ----------
-   16 imagens disponíveis; cada dificuldade sorteia aleatoriamente
+   29 imagens disponíveis; cada dificuldade sorteia aleatoriamente
    quantos pares precisar (6/8/12) a cada partida.                */
-const CARD_IMAGES = Array.from({ length: 16 }, (_, i) => `assets/cards/${i + 1}.png`);
+const CARD_IMAGES = Array.from({ length: 29 }, (_, i) => `assets/cards/${i + 1}.png`);
 
 /* ---------- config ---------- */
 const DIFFS = {
@@ -34,12 +34,12 @@ const FLIP_BACK_MS = 700;
 
 /* ---------- estado ---------- */
 const S = { diff:null, pairs:0, cols:0, found:0, moves:0, first:null, lock:false,
-            timeLeft:0, total:0, end:0, timer:null, idle:null };
+            timeLeft:0, total:0, end:0, timer:null, idle:null, leadName:null };
 
 /* ---------- telas ---------- */
 const scr = {
-  start:$("#screen-start"), select:$("#screen-select"), game:$("#screen-game"),
-  win:$("#screen-win"), lose:$("#screen-lose"),
+  start:$("#screen-start"), select:$("#screen-select"), lead:$("#screen-lead"), admin:$("#screen-admin"),
+  game:$("#screen-game"), win:$("#screen-win"), lose:$("#screen-lose"),
 };
 function show(name){
   $$(".screen").forEach(s=>s.classList.remove("screen--active"));
@@ -112,10 +112,141 @@ function buildSelect(){
       <div class="diff__name">${cfg.label}</div>
       <div class="diff__meta"><span><b>${cfg.pairs}</b> pares</span><span><b>${cfg.cols}×${Math.ceil(cfg.pairs*2/cfg.cols)}</b></span><span><b>${cfg.time}s</b></span></div>
       <div class="diff__best">${best!=null?`Recorde · ${fmt(best)}`:"Sem recorde ainda"}</div>`;
-    el.addEventListener("click", ()=>{ sfx.click(); startGame(key); });
+    el.addEventListener("click", ()=>{ sfx.click(); openLead(key); });
     grid.appendChild(el);
   });
 }
+
+/* ============================================================
+   CAPTAÇÃO DE LEAD (nome, idade, telefone)
+   ============================================================ */
+const LEADS_KEY = "tannat_leads";
+let pendingDiff = null;
+
+function openLead(diff){
+  pendingDiff = diff;
+  const form=$("#lead-form");
+  form.reset();
+  $("#lead-error").hidden = true;
+  $$("input", form).forEach(i=>i.classList.remove("touched"));
+  show("lead");
+  setTimeout(()=>$("#lead-name").focus(), 50);
+}
+
+function saveLead(entry){
+  let list=[];
+  try{ list=JSON.parse(localStorage.getItem(LEADS_KEY))||[]; }catch{ list=[]; }
+  list.push(entry);
+  localStorage.setItem(LEADS_KEY, JSON.stringify(list));
+}
+
+function submitLead(e){
+  e.preventDefault();
+  const nameEl=$("#lead-name"), ageEl=$("#lead-age"), phoneEl=$("#lead-phone");
+  const name=nameEl.value.trim();
+  const age=ageEl.value.trim();
+  const phone=phoneEl.value.trim();
+  const errEl=$("#lead-error");
+
+  const digits=phone.replace(/\D/g,"");
+  const ageNum=Number(age);
+  const valid = name.length>=2 && Number.isInteger(ageNum) && ageNum>=1 && ageNum<=120 && digits.length>=8;
+
+  if(!valid){
+    [nameEl,ageEl,phoneEl].forEach(i=>i.classList.add("touched"));
+    errEl.textContent="Confira os campos: nome, idade e telefone válidos.";
+    errEl.hidden=false;
+    sfx.wrong();
+    return;
+  }
+
+  S.leadName = name.slice(0,14);
+  saveLead({ name, age:ageNum, phone, diff:pendingDiff, ts:Date.now() });
+  sfx.click();
+  startGame(pendingDiff);
+}
+$("#lead-form").addEventListener("submit", submitLead);
+$("#btn-back-select").addEventListener("click", ()=>{ sfx.click(); show("select"); });
+
+/* ============================================================
+   PAINEL ADMIN (F9) — lista e exportação de leads
+   ============================================================ */
+let adminReturnScreen = "start";
+const loadLeads = () => { try{ return JSON.parse(localStorage.getItem(LEADS_KEY))||[]; }catch{ return []; } };
+const activeScreenName = () => Object.keys(scr).find(k => scr[k].classList.contains("screen--active")) || "start";
+
+function renderAdmin(){
+  const leads = loadLeads().slice().sort((a,b)=>b.ts-a.ts);
+  $("#admin-tbody").innerHTML = leads.map(l=>`
+    <tr>
+      <td>${escapeHTML(l.name)}</td>
+      <td>${l.age}</td>
+      <td>${escapeHTML(l.phone)}</td>
+      <td>${escapeHTML(DIFFS[l.diff]?.label || l.diff || "")}</td>
+      <td>${new Date(l.ts).toLocaleString("pt-BR")}</td>
+    </tr>`).join("");
+  $("#admin-empty").hidden = leads.length>0;
+}
+
+function openAdmin(){
+  const current = activeScreenName();
+  if(current==="admin"){ renderAdmin(); return; }
+  adminReturnScreen = current;
+  renderAdmin();
+  show("admin");
+}
+function closeAdmin(){ resetClearBtn(); sfx.click(); show(adminReturnScreen); }
+
+let clearArmed=false, clearArmTimer=null;
+function resetClearBtn(){
+  clearArmed=false;
+  clearTimeout(clearArmTimer); clearArmTimer=null;
+  const btn=$("#btn-clear-leads");
+  btn.textContent="Limpar lista";
+  btn.classList.remove("btn--danger-armed");
+}
+function handleClearLeads(){
+  const btn=$("#btn-clear-leads");
+  if(!clearArmed){
+    clearArmed=true;
+    btn.textContent="Confirmar limpeza?";
+    btn.classList.add("btn--danger-armed");
+    clearTimeout(clearArmTimer);
+    clearArmTimer=setTimeout(resetClearBtn, 4000);
+    sfx.wrong();
+    return;
+  }
+  localStorage.removeItem(LEADS_KEY);
+  resetClearBtn();
+  renderAdmin();
+  sfx.click();
+}
+$("#btn-clear-leads").addEventListener("click", handleClearLeads);
+
+function exportLeadsCSV(){
+  const leads = loadLeads().slice().sort((a,b)=>a.ts-b.ts);
+  if(!leads.length) return;
+  const header=["Nome","Idade","Telefone","Dificuldade","Data"];
+  const rows = leads.map(l=>[l.name, l.age, l.phone, DIFFS[l.diff]?.label || l.diff || "", new Date(l.ts).toLocaleString("pt-BR")]);
+  const csvEscape = v => `"${String(v).replace(/"/g,'""')}"`;
+  const csv = [header, ...rows].map(r=>r.map(csvEscape).join(";")).join("\r\n");
+  const BOM = String.fromCharCode(0xFEFF);
+  const blob = new Blob([BOM+csv], {type:"text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const stamp = new Date().toISOString().slice(0,16).replace(/[:T]/g,"-");
+  a.href=url; a.download=`tannat_leads_${stamp}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  sfx.click();
+}
+
+$("#btn-export-csv").addEventListener("click", exportLeadsCSV);
+$("#btn-close-admin").addEventListener("click", closeAdmin);
+document.addEventListener("keydown", e=>{
+  if(e.key==="F9"){ e.preventDefault(); openAdmin(); }
+  else if(e.key==="Escape" && scr.admin.classList.contains("screen--active")){ closeAdmin(); }
+});
 
 /* ============================================================
    TABULEIRO
@@ -226,25 +357,14 @@ function win(){
   if(record){ rec.hidden=false; $("#win-record-txt").textContent="🏆 Novo recorde!"; }
   else rec.hidden=true;
 
-  // reseta bloco de nome/ranking
-  $("#name-row").style.display="flex";
-  $("#ranks").hidden=true;
-  $("#win-name").value="";
-  win._pending={diff:S.diff, time:elapsed, moves:S.moves};
+  const name=(S.leadName||"Convidado").slice(0,14);
+  const entry={name, time:elapsed, moves:S.moves, ts:Date.now()};
+  saveRank(S.diff, entry);
+  renderRanks(S.diff, entry);
 
   show("win");
   sfx.win();
   startConfetti();
-}
-
-function commitName(){
-  const p=win._pending; if(!p) return;
-  const name=($("#win-name").value.trim()||"Convidado").slice(0,14);
-  const entry={name, time:p.time, moves:p.moves, ts:Date.now()};
-  const pos=saveRank(p.diff, entry);
-  renderRanks(p.diff, entry);
-  $("#name-row").style.display="none";
-  sfx.click();
 }
 function renderRanks(diff, me){
   const list=loadRank(diff);
@@ -278,9 +398,6 @@ $("#btn-again").addEventListener("click",()=>{ stopConfetti(); sfx.click(); star
 $("#btn-menu").addEventListener("click",()=>{ stopConfetti(); stopTimer(); sfx.click(); show("start"); });
 $("#btn-retry").addEventListener("click",()=>{ sfx.click(); startGame(S.diff); });
 $("#btn-lose-menu").addEventListener("click",()=>{ stopTimer(); sfx.click(); show("start"); });
-
-$("#btn-save-name").addEventListener("click",commitName);
-$("#win-name").addEventListener("keydown",e=>{ if(e.key==="Enter") commitName(); });
 
 $("#btn-sound").addEventListener("click",toggleSound);
 $("#btn-sound-2").addEventListener("click",toggleSound);

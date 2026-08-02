@@ -189,6 +189,34 @@ body {
 .diff__meta b { color: var(--gold-200); font-weight: 700; }
 .diff__best { margin-top: 2px; font-size: clamp(10px,1.5vmin,12px); letter-spacing: .08em; text-transform: uppercase; color: var(--gold-500); min-height: 1.1em; }
 
+/* ---------- captação de lead ---------- */
+.lead-form__hint { font-size: clamp(12px,1.8vmin,14px); color: var(--cream-dim); max-width: 34ch; text-align: center; }
+.lead-form { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 360px; align-items: center; }
+.lead-form input { width: 100%; background: rgba(0,0,0,.35); border: 1px solid rgba(203,177,130,.4);
+  color: var(--cream); border-radius: 14px; padding: 14px 18px; font-family: var(--font-sans);
+  font-size: 15px; letter-spacing: .02em; }
+.lead-form input::placeholder { color: rgba(203,177,130,.6); }
+.lead-form input:focus { outline: none; border-color: var(--gold-400); box-shadow: var(--ring); }
+.lead-form input:invalid.touched { border-color: var(--bad); }
+.lead-form__error { color: var(--coral); font-size: 13px; font-weight: 600; text-align: center; }
+
+/* ---------- painel admin (F9) ---------- */
+.panel--wide { width: min(920px, 96vw); }
+.admin-table-wrap { width: 100%; max-height: 46vh; overflow-y: auto; border: 1px solid rgba(203,177,130,.28); border-radius: 14px; }
+.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.admin-table th, .admin-table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid rgba(203,177,130,.15); white-space: nowrap; }
+.admin-table th { position: sticky; top: 0; background: rgba(27,7,10,.95); color: var(--gold-300);
+  text-transform: uppercase; font-size: 11px; letter-spacing: .08em; }
+.admin-table td { color: var(--cream); }
+.admin-table tbody tr:hover { background: rgba(227,185,90,.06); }
+.admin-empty { color: var(--cream-dim); padding: 24px; text-align: center; }
+
+.btn--danger { border-color: rgba(200,71,79,.5); color: var(--bad); }
+.btn--danger:hover { color: var(--cream); border-color: var(--bad); background: rgba(200,71,79,.12); }
+.btn--danger-armed { color: var(--cream); border-color: var(--bad); background: rgba(200,71,79,.35);
+  animation: pulse-danger 1s ease-in-out infinite; }
+@keyframes pulse-danger { 0%,100% { opacity: 1; } 50% { opacity: .6; } }
+
 /* ---------- HUD do jogo ---------- */
 .topbar {
   position: absolute; top: 0; left: 0; right: 0; z-index: 4;
@@ -291,14 +319,6 @@ body {
 .result__stat .k { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--cream-dim); }
 .result__record { color: var(--gold-300); font-weight: 700; letter-spacing: .08em; display: flex; align-items: center; gap: 8px; }
 .result__actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 4px; }
-
-/* entrada de nome opcional */
-.name-row { display: flex; gap: 8px; width: 100%; max-width: 340px; }
-.name-row input { flex: 1; background: rgba(0,0,0,.35); border: 1px solid rgba(203,177,130,.4);
-  color: var(--cream); border-radius: 999px; padding: 12px 18px; font-family: var(--font-sans); font-size: 15px; letter-spacing: .04em; }
-.name-row input::placeholder { color: rgba(203,177,130,.6); }
-.name-row input:focus { outline: none; border-color: var(--gold-400); box-shadow: var(--ring); }
-.name-row .btn { padding: 12px 20px; }
 
 /* leaderboard da sessão */
 .ranks { width: 100%; max-width: 380px; }

@@ -57,6 +57,56 @@
       </div>
     </section>
 
+    <!-- ============ LEAD ============ -->
+    <section id="screen-lead" class="screen" aria-label="Seus dados">
+      <div class="ambient"></div>
+      <div class="panel">
+        <div class="brand">
+          <div class="wordmark wordmark--sm">TANNAT</div>
+        </div>
+        <h2 class="panel__title">Antes de <em>começar</em></h2>
+        <p class="lead-form__hint">Preencha seus dados para participar do ranking da noite.</p>
+
+        <form class="lead-form" id="lead-form" novalidate>
+          <input id="lead-name" type="text" placeholder="Nome" autocomplete="name" maxlength="40" required>
+          <input id="lead-age" type="number" placeholder="Idade" autocomplete="off" inputmode="numeric" min="1" max="120" required>
+          <input id="lead-phone" type="tel" placeholder="Telefone" autocomplete="tel" inputmode="tel" maxlength="15" required>
+          <span class="lead-form__error" id="lead-error" hidden></span>
+          <div class="result__actions">
+            <button class="btn" type="submit">Começar a jogar</button>
+            <button class="btn btn--ghost" type="button" id="btn-back-select">Voltar</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ============ ADMIN (F9) ============ -->
+    <section id="screen-admin" class="screen" aria-label="Leads capturados">
+      <div class="ambient"></div>
+      <div class="panel panel--wide">
+        <div class="brand">
+          <div class="wordmark wordmark--sm">TANNAT</div>
+        </div>
+        <h2 class="panel__title">Leads <em>capturados</em></h2>
+
+        <div class="admin-table-wrap">
+          <table class="admin-table" id="admin-table">
+            <thead>
+              <tr><th>Nome</th><th>Idade</th><th>Telefone</th><th>Dificuldade</th><th>Data</th></tr>
+            </thead>
+            <tbody id="admin-tbody"></tbody>
+          </table>
+          <p class="admin-empty" id="admin-empty" hidden>Nenhum lead capturado ainda.</p>
+        </div>
+
+        <div class="result__actions">
+          <button class="btn" id="btn-export-csv">Exportar CSV</button>
+          <button class="btn btn--ghost btn--danger" type="button" id="btn-clear-leads">Limpar lista</button>
+          <button class="btn btn--ghost" id="btn-close-admin">Fechar</button>
+        </div>
+      </div>
+    </section>
+
     <!-- ============ JOGO ============ -->
     <section id="screen-game" class="screen" aria-label="Tabuleiro">
       <header class="topbar" role="toolbar" aria-label="Painel do jogo">
@@ -91,11 +141,6 @@
           <div class="result__stat"><span class="v" id="win-time">00:00</span><span class="k">Seu tempo</span></div>
           <div class="result__stat"><span class="v" id="win-moves">0</span><span class="k">Jogadas</span></div>
           <div class="result__stat"><span class="v" id="win-best">—</span><span class="k">Recorde</span></div>
-        </div>
-
-        <div class="name-row" id="name-row">
-          <input id="win-name" maxlength="14" placeholder="Seu nome para o ranking" autocomplete="off">
-          <button class="btn" id="btn-save-name">Salvar</button>
         </div>
 
         <div class="ranks" id="ranks" hidden>
