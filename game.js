@@ -46,7 +46,7 @@ function show(name){
   scr[name].classList.add("screen--active");
 }
 
-/* ---------- bloqueio de zoom durante a partida ---------- */
+/* ---------- bloqueio de zoom e clique direito em todo o site ---------- */
 const blockGesture = e => e.preventDefault();
 const blockWheelZoom = e => { if(e.ctrlKey) e.preventDefault(); };
 const blockKeyZoom = e => { if((e.ctrlKey||e.metaKey) && ["+","-","=","0"].includes(e.key)) e.preventDefault(); };
@@ -57,7 +57,8 @@ const blockDoubleTapZoom = e => {
   if(now-lastTouchEnd<=350) e.preventDefault();
   lastTouchEnd=now;
 };
-function lockZoom(){
+const blockRightClick = e => { if(e.button===2) e.preventDefault(); };
+(function lockZoomAndRightClick(){
   document.body.classList.add("no-zoom");
   document.addEventListener("touchmove", blockPinchZoom, {passive:false});
   document.addEventListener("touchend", blockDoubleTapZoom, {passive:false});
@@ -65,16 +66,10 @@ function lockZoom(){
   document.addEventListener("gesturechange", blockGesture, {passive:false});
   document.addEventListener("wheel", blockWheelZoom, {passive:false});
   document.addEventListener("keydown", blockKeyZoom);
-}
-function unlockZoom(){
-  document.body.classList.remove("no-zoom");
-  document.removeEventListener("touchmove", blockPinchZoom, {passive:false});
-  document.removeEventListener("touchend", blockDoubleTapZoom, {passive:false});
-  document.removeEventListener("gesturestart", blockGesture, {passive:false});
-  document.removeEventListener("gesturechange", blockGesture, {passive:false});
-  document.removeEventListener("wheel", blockWheelZoom, {passive:false});
-  document.removeEventListener("keydown", blockKeyZoom);
-}
+  document.addEventListener("contextmenu", blockGesture);
+  document.addEventListener("mousedown", blockRightClick);
+  document.addEventListener("mouseup", blockRightClick);
+})();
 
 /* ---------- utils ---------- */
 const shuffle = a => { for(let i=a.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[a[i],a[j]]=[a[j],a[i]];} return a; };
@@ -316,7 +311,6 @@ function startGame(diff){
 
   stopTimer();
   show("game");
-  lockZoom();
   requestAnimationFrame(fitBoard);
 }
 
@@ -393,7 +387,6 @@ function win(){
   saveRank(S.diff, entry);
   renderRanks(S.diff, entry);
 
-  unlockZoom();
   show("win");
   sfx.win();
   startConfetti();
@@ -414,7 +407,6 @@ const escapeHTML = s => s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt
 /* ---------- derrota ---------- */
 function lose(){
   S.lock=true; $("#board").style.pointerEvents="none";
-  unlockZoom();
   $("#lose-pairs").textContent=`${S.found}/${S.pairs}`;
   $("#lose-moves").textContent=S.moves;
   show("lose"); sfx.lose();
@@ -425,7 +417,7 @@ function lose(){
    ============================================================ */
 $("#btn-play").addEventListener("click",()=>{ ac(); sfx.click(); buildSelect(); show("select"); });
 $("#btn-back-start").addEventListener("click",()=>{ sfx.click(); show("start"); });
-$("#btn-exit").addEventListener("click",()=>{ stopTimer(); unlockZoom(); sfx.click(); buildSelect(); show("select"); });
+$("#btn-exit").addEventListener("click",()=>{ stopTimer(); sfx.click(); buildSelect(); show("select"); });
 
 $("#btn-again").addEventListener("click",()=>{ stopConfetti(); sfx.click(); startGame(S.diff); });
 $("#btn-menu").addEventListener("click",()=>{ stopConfetti(); stopTimer(); sfx.click(); show("start"); });
