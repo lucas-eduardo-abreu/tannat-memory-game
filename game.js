@@ -22,7 +22,7 @@ const ICONS = {
 /* ---------- baralho de cartas (fotos em assets/cards) ----------
    29 imagens disponíveis; cada dificuldade sorteia aleatoriamente
    quantos pares precisar (6/8/12) a cada partida.                */
-const CARD_IMAGES = Array.from({ length: 29 }, (_, i) => `assets/cards/${i + 1}.png`);
+const CARD_IMAGES = Array.from({ length: 29 }, (_, i) => `assets/cards/${i + 1}.jpg`);
 
 /* ---------- config ---------- */
 const DIFFS = {
@@ -44,6 +44,36 @@ const scr = {
 function show(name){
   $$(".screen").forEach(s=>s.classList.remove("screen--active"));
   scr[name].classList.add("screen--active");
+}
+
+/* ---------- bloqueio de zoom durante a partida ---------- */
+const blockGesture = e => e.preventDefault();
+const blockWheelZoom = e => { if(e.ctrlKey) e.preventDefault(); };
+const blockKeyZoom = e => { if((e.ctrlKey||e.metaKey) && ["+","-","=","0"].includes(e.key)) e.preventDefault(); };
+const blockPinchZoom = e => { if(e.touches && e.touches.length>1) e.preventDefault(); };
+let lastTouchEnd=0;
+const blockDoubleTapZoom = e => {
+  const now=Date.now();
+  if(now-lastTouchEnd<=350) e.preventDefault();
+  lastTouchEnd=now;
+};
+function lockZoom(){
+  document.body.classList.add("no-zoom");
+  document.addEventListener("touchmove", blockPinchZoom, {passive:false});
+  document.addEventListener("touchend", blockDoubleTapZoom, {passive:false});
+  document.addEventListener("gesturestart", blockGesture, {passive:false});
+  document.addEventListener("gesturechange", blockGesture, {passive:false});
+  document.addEventListener("wheel", blockWheelZoom, {passive:false});
+  document.addEventListener("keydown", blockKeyZoom);
+}
+function unlockZoom(){
+  document.body.classList.remove("no-zoom");
+  document.removeEventListener("touchmove", blockPinchZoom, {passive:false});
+  document.removeEventListener("touchend", blockDoubleTapZoom, {passive:false});
+  document.removeEventListener("gesturestart", blockGesture, {passive:false});
+  document.removeEventListener("gesturechange", blockGesture, {passive:false});
+  document.removeEventListener("wheel", blockWheelZoom, {passive:false});
+  document.removeEventListener("keydown", blockKeyZoom);
 }
 
 /* ---------- utils ---------- */
@@ -286,6 +316,7 @@ function startGame(diff){
 
   stopTimer();
   show("game");
+  lockZoom();
   requestAnimationFrame(fitBoard);
 }
 
@@ -362,6 +393,7 @@ function win(){
   saveRank(S.diff, entry);
   renderRanks(S.diff, entry);
 
+  unlockZoom();
   show("win");
   sfx.win();
   startConfetti();
@@ -382,6 +414,7 @@ const escapeHTML = s => s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt
 /* ---------- derrota ---------- */
 function lose(){
   S.lock=true; $("#board").style.pointerEvents="none";
+  unlockZoom();
   $("#lose-pairs").textContent=`${S.found}/${S.pairs}`;
   $("#lose-moves").textContent=S.moves;
   show("lose"); sfx.lose();
@@ -392,7 +425,7 @@ function lose(){
    ============================================================ */
 $("#btn-play").addEventListener("click",()=>{ ac(); sfx.click(); buildSelect(); show("select"); });
 $("#btn-back-start").addEventListener("click",()=>{ sfx.click(); show("start"); });
-$("#btn-exit").addEventListener("click",()=>{ stopTimer(); sfx.click(); buildSelect(); show("select"); });
+$("#btn-exit").addEventListener("click",()=>{ stopTimer(); unlockZoom(); sfx.click(); buildSelect(); show("select"); });
 
 $("#btn-again").addEventListener("click",()=>{ stopConfetti(); sfx.click(); startGame(S.diff); });
 $("#btn-menu").addEventListener("click",()=>{ stopConfetti(); stopTimer(); sfx.click(); show("start"); });
