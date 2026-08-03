@@ -12,13 +12,19 @@ Basta abrir o `index.html` em qualquer navegador moderno — duplo-clique funcio
 
 Para o totem, recomendo abrir em **tela cheia** (botão ⛶ na tela inicial, ou `F11`).
 
-## Dificuldades
+## Como funciona a partida
 
-| Nível   | Pares | Tabuleiro | Tempo |
-|---------|-------|-----------|-------|
-| Fácil   | 6     | 3 × 4     | 60 s  |
-| Médio   | 8     | 4 × 4     | 90 s  |
-| Difícil | 12    | 6 × 4     | 120 s |
+Não há mais escolha de dificuldade: é uma rodada única, um pouco maior que o
+antigo nível "Médio".
+
+| Pares | Tabuleiro | Tempo |
+|-------|-----------|-------|
+| 10    | 5 × 4     | 100 s |
+
+Fluxo de cada partida: o jogador informa os dados (lead) → **contagem
+regressiva de 3 segundos** → o tabuleiro aparece com **todas as cartas viradas
+mostrando o conteúdo por 2 segundos** → as cartas viram de volta e a partida
+começa (o cronômetro só conta a partir do primeiro clique do jogador).
 
 O tamanho das cartas é **calculado dinamicamente** para caber sem scroll em
 qualquer tela — celular, notebook ou totem, em retrato ou paisagem.
@@ -29,9 +35,9 @@ qualquer tela — celular, notebook ou totem, em retrato ou paisagem.
   linguagem da marca (taça, brinde, garrafa, uvas, drink, globo, câmera, etc.).
 - Timer com barra, contador de **jogadas** e **pares**.
 - **Som** por WebAudio (sem arquivos) — botão liga/desliga, preferência salva.
-- **Recorde** por dificuldade + **ranking da noite** (top 8). O nome usado no
-  ranking é o mesmo informado na captação de lead — não pede nome de novo na
-  tela de vitória.
+- **Recorde** + **ranking da noite** (top 8). O nome usado no ranking é o
+  mesmo informado na captação de lead — não pede nome de novo na tela de
+  vitória.
 - **Captação de lead**: antes de cada partida, o jogador informa nome, idade e
   telefone; os dados ficam salvos no `localStorage` (`tannat_leads`).
 - **Painel admin (tecla F9)**: mostra a lista de leads capturados neste
@@ -60,13 +66,15 @@ tannat-memory-game/
 
 O goblet (marca/verso da carta) é **SVG inline** (dentro do `game.js`). A frente das
 cartas usa as **fotos** de `assets/cards/`: a cada partida, `CARD_IMAGES` é embaralhado
-e cada dificuldade sorteia quantas fotos precisar (6/8/12 pares), então o conjunto e a
-posição das cartas mudam a cada rodada.
+e são sorteadas as fotos necessárias (10 pares), então o conjunto e a posição das
+cartas mudam a cada rodada.
 
 ## Personalizações rápidas
 
 - **Cores / tipografia:** variáveis no topo do `style.css` (`:root`).
-- **Tempo / nº de pares:** objeto `DIFFS` no `game.js`.
+- **Tempo / nº de pares:** objeto `DIFFS` no `game.js` (hoje só tem a entrada `default`).
+- **Contagem regressiva / prévia das cartas:** constantes `COUNTDOWN_SECONDS` e
+  `PREVIEW_MS` no topo do `game.js`.
 - **Fotos das cartas:** troque os arquivos em `assets/cards/` (mantenha 29 imagens
   nomeadas `1`…`29`, mesma extensão por arquivo) — o array `CARD_IMAGES` no `game.js`
   monta a lista automaticamente a partir desses nomes.

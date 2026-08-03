@@ -79,9 +79,9 @@ body {
 }
 .screen > * { position: relative; z-index: 1; }
 
-#screen-start  { background-image: url("assets/bg/hero.jpg"); }
-#screen-select { background-image: url("assets/bg/lounge.jpg"); }
-#screen-game   { background-image: url("assets/bg/board.jpg"); }
+#screen-start     { background-image: url("assets/bg/hero.jpg"); }
+#screen-countdown { background-image: url("assets/bg/lounge.jpg"); }
+#screen-game      { background-image: url("assets/bg/board.jpg"); }
 #screen-win,
 #screen-lose   { background-image: url("assets/bg/win.jpg"); }
 
@@ -166,29 +166,21 @@ body {
 
 .corner-tools { position: absolute; top: clamp(12px,2.4vmin,22px); right: clamp(12px,2.4vmin,22px); display: flex; gap: 10px; z-index: 3; }
 
-/* ---------- seleção de dificuldade ---------- */
+/* ---------- painel (lead / admin) ---------- */
 .panel { width: min(880px, 96vw); text-align: center; display: flex; flex-direction: column; align-items: center; gap: clamp(16px,3vmin,30px); }
 .panel__title { font-family: var(--font-display); font-weight: 500; font-size: clamp(24px,5vmin,42px); color: var(--cream); }
 .panel__title em { font-style: italic; color: var(--gold-300); }
 
-.diff-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(12px,2vmin,20px); width: 100%; }
-.diff {
-  cursor: pointer; text-align: left; border-radius: 18px; padding: clamp(16px,2.6vmin,26px);
-  background: linear-gradient(165deg, rgba(44,12,16,.92), rgba(27,7,10,.92));
-  border: 1px solid rgba(203,177,130,.28);
-  box-shadow: var(--shadow-lg);
-  transition: transform .16s ease, border-color .2s ease, box-shadow .2s ease;
-  display: flex; flex-direction: column; gap: 10px; color: var(--cream);
+/* ---------- contagem regressiva ---------- */
+.countdown { display: flex; flex-direction: column; align-items: center; gap: clamp(10px,2vmin,18px); }
+.countdown__hint { font-size: clamp(11px,1.8vmin,14px); letter-spacing: .28em; text-transform: uppercase; color: var(--gold-300); }
+.countdown-number {
+  font-family: var(--font-display); font-weight: 600; line-height: 1;
+  font-size: clamp(120px, 32vmin, 260px); color: var(--gold-200);
+  text-shadow: 0 14px 50px rgba(0,0,0,.65);
+  animation: countdown-pop .55s cubic-bezier(.3,1.4,.4,1) both;
 }
-.diff:hover { transform: translateY(-4px); border-color: var(--gold-400); box-shadow: var(--shadow-lg), 0 0 0 1px rgba(240,210,127,.3); }
-.diff:focus-visible { outline: none; box-shadow: var(--ring); }
-.diff__glasses { color: var(--gold-300); display: flex; gap: 4px; height: 30px; }
-.diff__glasses svg { width: 22px; height: 30px; }
-.diff__glasses .dim { opacity: .22; }
-.diff__name { font-family: var(--font-display); font-size: clamp(20px,3.2vmin,28px); font-weight: 600; }
-.diff__meta { display: flex; gap: 16px; font-size: clamp(11px,1.6vmin,13px); color: var(--cream-dim); letter-spacing: .04em; }
-.diff__meta b { color: var(--gold-200); font-weight: 700; }
-.diff__best { margin-top: 2px; font-size: clamp(10px,1.5vmin,12px); letter-spacing: .08em; text-transform: uppercase; color: var(--gold-500); min-height: 1.1em; }
+@keyframes countdown-pop { from { transform: scale(.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
 /* ---------- captação de lead ---------- */
 .lead-form__hint { font-size: clamp(12px,1.8vmin,14px); color: var(--cream-dim); max-width: 34ch; text-align: center; }
@@ -254,9 +246,7 @@ body {
   width: min(1120px, 96vw); height: calc(100dvh - clamp(60px,10vmin,88px));
   grid-auto-rows: var(--cell-size);
 }
-.board--easy   { grid-template-columns: repeat(3, var(--cell-size)); }
-.board--medium { grid-template-columns: repeat(4, var(--cell-size)); }
-.board--hard   { grid-template-columns: repeat(6, var(--cell-size)); }
+.board--default { grid-template-columns: repeat(5, var(--cell-size)); }
 
 /* ---------- carta ---------- */
 .card { perspective: 1000px; cursor: pointer; }
@@ -354,7 +344,6 @@ body {
 }
 
 @media (max-width: 560px) {
-  .diff-grid { grid-template-columns: 1fr; }
   .topbar__center { gap: 10px; }
   .stat { min-width: 44px; }
 }

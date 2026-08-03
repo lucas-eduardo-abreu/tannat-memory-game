@@ -14,31 +14,32 @@ const GOBLET = `<svg viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/
   <path d="M30 98h40" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/>
 </svg>`;
 
-/* ---------- goblet usado na marca / dificuldade ---------- */
+/* ---------- goblet usado na marca ---------- */
 const ICONS = {
   goblet: `<path d="M7 3h10v3a5 5 0 0 1-10 0z"/><path d="M12 14v6"/><path d="M8 21h8"/>`,
 };
 
 /* ---------- baralho de cartas (fotos em assets/cards) ----------
-   29 imagens disponíveis; cada dificuldade sorteia aleatoriamente
-   quantos pares precisar (6/8/12) a cada partida.                */
+   29 imagens disponíveis; cada partida sorteia aleatoriamente
+   quantos pares precisar.                                        */
 const CARD_IMAGES = Array.from({ length: 29 }, (_, i) => `assets/cards/${i + 1}.jpg`);
 
-/* ---------- config ---------- */
+/* ---------- config (dificuldade única, um pouco acima do "médio" de antes) ---------- */
 const DIFFS = {
-  easy:   { label: "Fácil",   pairs: 6,  cols: 3, time: 60,  maxCell: 200 },
-  medium: { label: "Médio",   pairs: 8,  cols: 4, time: 90,  maxCell: 176 },
-  hard:   { label: "Difícil", pairs: 12, cols: 6, time: 120, maxCell: 148 },
+  default: { label: "Tannat", pairs: 10, cols: 5, time: 100, maxCell: 160 },
 };
 const FLIP_BACK_MS = 700;
+const COUNTDOWN_SECONDS = 3;
+const PREVIEW_MS = 2000;
+const FLIP_ANIM_MS = 560;
 
 /* ---------- estado ---------- */
-const S = { diff:null, pairs:0, cols:0, found:0, moves:0, first:null, lock:false,
+const S = { diff:null, pairs:0, cols:0, found:0, moves:0, first:null, lock:false, previewLock:false,
             timeLeft:0, total:0, end:0, timer:null, idle:null, leadName:null };
 
 /* ---------- telas ---------- */
 const scr = {
-  start:$("#screen-start"), select:$("#screen-select"), lead:$("#screen-lead"), admin:$("#screen-admin"),
+  start:$("#screen-start"), lead:$("#screen-lead"), countdown:$("#screen-countdown"), admin:$("#screen-admin"),
   game:$("#screen-game"), win:$("#screen-win"), lose:$("#screen-lose"),
 };
 function show(name){
@@ -122,31 +123,10 @@ function saveRank(d, entry){
 }
 
 /* ============================================================
-   SELEÇÃO DE DIFICULDADE
-   ============================================================ */
-const GLASS = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICONS.goblet}</svg>`;
-function buildSelect(){
-  const grid=$("#diff-grid"); grid.innerHTML="";
-  Object.entries(DIFFS).forEach(([key,cfg],idx)=>{
-    const best=loadBest(key);
-    const glasses = Array.from({length:3},(_,i)=>`<span class="${i<=idx?'':'dim'}">${GLASS}</span>`).join("");
-    const el=document.createElement("button");
-    el.className="diff"; el.dataset.diff=key; el.type="button";
-    el.innerHTML = `
-      <div class="diff__glasses" aria-hidden="true">${glasses}</div>
-      <div class="diff__name">${cfg.label}</div>
-      <div class="diff__meta"><span><b>${cfg.pairs}</b> pares</span><span><b>${cfg.cols}×${Math.ceil(cfg.pairs*2/cfg.cols)}</b></span><span><b>${cfg.time}s</b></span></div>
-      <div class="diff__best">${best!=null?`Recorde · ${fmt(best)}`:"Sem recorde ainda"}</div>`;
-    el.addEventListener("click", ()=>{ sfx.click(); openLead(key); });
-    grid.appendChild(el);
-  });
-}
-
-/* ============================================================
    CAPTAÇÃO DE LEAD (nome, idade, telefone)
    ============================================================ */
 const LEADS_KEY = "tannat_leads";
-let pendingDiff = null;
+let pendingDiff = "default";
 
 function openLead(diff){
   pendingDiff = diff;
@@ -188,10 +168,28 @@ function submitLead(e){
   S.leadName = name.slice(0,14);
   saveLead({ name, age:ageNum, phone, diff:pendingDiff, ts:Date.now() });
   sfx.click();
-  startGame(pendingDiff);
+  startCountdown(pendingDiff);
 }
 $("#lead-form").addEventListener("submit", submitLead);
-$("#btn-back-select").addEventListener("click", ()=>{ sfx.click(); show("select"); });
+$("#btn-back-start").addEventListener("click", ()=>{ sfx.click(); show("start"); });
+
+/* ============================================================
+   CONTAGEM REGRESSIVA (3, 2, 1) antes da partida
+   ============================================================ */
+function startCountdown(diff){
+  show("countdown");
+  const el = $("#countdown-number");
+  let n = COUNTDOWN_SECONDS;
+  const tick = () => {
+    if(n === 0){ startGame(diff); return; }
+    el.textContent = n;
+    el.style.animation = "none"; void el.offsetWidth; el.style.animation = "";
+    sfx.click();
+    n--;
+    setTimeout(tick, 1000);
+  };
+  tick();
+}
 
 /* ============================================================
    PAINEL ADMIN (F9) — lista e exportação de leads
@@ -278,7 +276,7 @@ document.addEventListener("keydown", e=>{
    ============================================================ */
 function startGame(diff){
   const cfg=DIFFS[diff];
-  Object.assign(S,{diff,pairs:cfg.pairs,cols:cfg.cols,found:0,moves:0,first:null,lock:false,total:cfg.time,timeLeft:cfg.time});
+  Object.assign(S,{diff,pairs:cfg.pairs,cols:cfg.cols,found:0,moves:0,first:null,lock:false,previewLock:true,total:cfg.time,timeLeft:cfg.time});
 
   $("#hud-diff").textContent=cfg.label;
   $("#hud-pairs").textContent=`0/${cfg.pairs}`;
@@ -290,7 +288,7 @@ function startGame(diff){
   const board=$("#board");
   board.className="board board--"+diff;
   board.innerHTML="";
-  board.style.pointerEvents="auto";
+  board.style.pointerEvents="none";
 
   const picks=shuffle([...CARD_IMAGES]).slice(0,cfg.pairs);
   const deck=shuffle(picks.flatMap(k=>[{k},{k}]));
@@ -312,6 +310,23 @@ function startGame(diff){
   stopTimer();
   show("game");
   requestAnimationFrame(fitBoard);
+  previewCards();
+}
+
+/* Mostra o conteúdo de todas as cartas por alguns segundos antes
+   da partida começar, depois vira todas de volta. */
+function previewCards(){
+  const cards=$$(".card", $("#board"));
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    cards.forEach(c=>c.classList.add("flipped"));
+  }));
+  setTimeout(()=>{
+    cards.forEach(c=>c.classList.remove("flipped"));
+  }, FLIP_ANIM_MS + PREVIEW_MS);
+  setTimeout(()=>{
+    S.previewLock=false;
+    $("#board").style.pointerEvents="auto";
+  }, FLIP_ANIM_MS + PREVIEW_MS + FLIP_ANIM_MS);
 }
 
 /* Calcula o tamanho da célula (quadrada) para caber sem scroll,
@@ -331,7 +346,7 @@ function fitBoard(){
 }
 
 function flip(card){
-  if(S.lock || card.classList.contains("flipped") || card.classList.contains("matched")) return;
+  if(S.lock || S.previewLock || card.classList.contains("flipped") || card.classList.contains("matched")) return;
   card.classList.add("flipped"); sfx.flip();
   if(!S.timer) startTimer();
 
@@ -415,13 +430,12 @@ function lose(){
 /* ============================================================
    NAVEGAÇÃO
    ============================================================ */
-$("#btn-play").addEventListener("click",()=>{ ac(); sfx.click(); buildSelect(); show("select"); });
-$("#btn-back-start").addEventListener("click",()=>{ sfx.click(); show("start"); });
-$("#btn-exit").addEventListener("click",()=>{ stopTimer(); sfx.click(); buildSelect(); show("select"); });
+$("#btn-play").addEventListener("click",()=>{ ac(); sfx.click(); openLead("default"); });
+$("#btn-exit").addEventListener("click",()=>{ stopTimer(); sfx.click(); show("start"); });
 
-$("#btn-again").addEventListener("click",()=>{ stopConfetti(); sfx.click(); startGame(S.diff); });
+$("#btn-again").addEventListener("click",()=>{ stopConfetti(); sfx.click(); startCountdown(S.diff); });
 $("#btn-menu").addEventListener("click",()=>{ stopConfetti(); stopTimer(); sfx.click(); show("start"); });
-$("#btn-retry").addEventListener("click",()=>{ sfx.click(); startGame(S.diff); });
+$("#btn-retry").addEventListener("click",()=>{ sfx.click(); startCountdown(S.diff); });
 $("#btn-lose-menu").addEventListener("click",()=>{ stopTimer(); sfx.click(); show("start"); });
 
 $("#btn-sound").addEventListener("click",toggleSound);
@@ -436,7 +450,7 @@ $("#btn-fs").addEventListener("click",()=>{
 
 /* ---------- exit por teclado (Esc) ---------- */
 document.addEventListener("keydown",e=>{
-  if(e.key==="Escape" && scr.game.classList.contains("screen--active")){ stopTimer(); buildSelect(); show("select"); }
+  if(e.key==="Escape" && scr.game.classList.contains("screen--active")){ stopTimer(); show("start"); }
 });
 
 /* ============================================================
@@ -464,7 +478,6 @@ document.addEventListener("fullscreenchange", ()=>setTimeout(fitBoard,150));
 $("#brand-goblet").innerHTML=GOBLET;
 $("#rule-goblet").innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${ICONS.goblet}</svg>`;
 syncSoundBtns();
-buildSelect();
 resetIdle();
 show("start");
 

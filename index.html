@@ -42,21 +42,6 @@
       </div>
     </section>
 
-    <!-- ============ SELEÇÃO ============ -->
-    <section id="screen-select" class="screen" aria-label="Escolha a dificuldade">
-      <div class="ambient"></div>
-      <div class="panel">
-        <div class="brand">
-          <div class="wordmark wordmark--sm">TANNAT</div>
-        </div>
-        <h2 class="panel__title">Escolha sua <em>rodada</em></h2>
-
-        <div class="diff-grid" id="diff-grid" role="group" aria-label="Níveis de dificuldade"></div>
-
-        <button class="btn btn--ghost" id="btn-back-start">Voltar</button>
-      </div>
-    </section>
-
     <!-- ============ LEAD ============ -->
     <section id="screen-lead" class="screen" aria-label="Seus dados">
       <div class="ambient"></div>
@@ -74,9 +59,18 @@
           <span class="lead-form__error" id="lead-error" hidden></span>
           <div class="result__actions">
             <button class="btn" type="submit">Começar a jogar</button>
-            <button class="btn btn--ghost" type="button" id="btn-back-select">Voltar</button>
+            <button class="btn btn--ghost" type="button" id="btn-back-start">Voltar</button>
           </div>
         </form>
+      </div>
+    </section>
+
+    <!-- ============ CONTAGEM REGRESSIVA ============ -->
+    <section id="screen-countdown" class="screen" aria-label="Preparando a partida">
+      <div class="ambient"></div>
+      <div class="countdown">
+        <span class="countdown__hint">Prepare-se</span>
+        <span class="countdown-number" id="countdown-number">3</span>
       </div>
     </section>
 
