@@ -123,7 +123,7 @@ body {
 /* ---------- start ---------- */
 .start__lead { font-family: var(--font-display); font-style: italic; font-weight: 400;
   font-size: clamp(17px, 3.3vmin, 30px); color: var(--gold-200); max-width: 22ch; line-height: 1.35;
-  text-shadow: 0 2px 14px rgba(0,0,0,.6); }
+  text-align: center; text-shadow: 0 2px 14px rgba(0,0,0,.6); }
 .start__stack { display: flex; flex-direction: column; align-items: center; gap: clamp(18px,3.4vmin,34px); }
 
 /* ---------- botões ---------- */
